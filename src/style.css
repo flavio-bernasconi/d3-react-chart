@@ -1,0 +1,76 @@
+#root1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+#chart {
+  margin-left: 50px;
+}
+.tooltip {
+  background-color: white;
+  box-shadow: 2px 3px 10px rgb(193, 193, 193);
+  width: 200px;
+  display: block;
+  position: absolute;
+}
+.tooltip-text {
+  color: gray;
+  word-wrap: break-word;
+  padding: 20px 50px;
+}
+.tooltip-text {
+  text-transform: capitalize;
+}
+circle:not(:hover) {
+  opacity: 0.7;
+}
+circle:hover {
+  cursor: pointer;
+}
+.tick line {
+  stroke: rgb(228, 228, 228);
+}
+.domain {
+  stroke: white;
+}
+.btn {
+  margin-top: 40px;
+  margin-bottom: 100px;
+}
+.btn-group,
+.filter-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.filter-group {
+  margin-top: 0;
+}
+h4 {
+  margin-left: 15px;
+}
+
+button {
+  background-color: white;
+  display: inline-block;
+  margin: 0 15px;
+  border: solid 2px rgb(184, 184, 184);
+  padding: 10px 16px;
+  border-radius: 10px;
+  outline: 0;
+  font-weight: lighter;
+  font-size: 15px;
+}
+button:focus {
+  background-color: rgb(184, 184, 184);
+  color: white;
+  font-weight: bold;
+}
+button:hover {
+  cursor: pointer;
+}
+button::first-letter {
+  text-transform: capitalize;
+}
