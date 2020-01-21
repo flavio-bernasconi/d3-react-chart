@@ -85,8 +85,8 @@ export default function createBarChart(sectionBodyDisplayChart) {
       const margin = { left: 70, top: 20, right: 70, bottom: 20 }
       const innerWidth = chartWidth - margin.left - margin.right
       const innerHeight = chartHeight - margin.top - margin.bottom
-      const random = () => Math.floor(Math.random() * 10) + 1
-      var randomN = () => Math.floor(Math.random() * 21) - 10
+      const random = () => Math.floor(Math.random() * 30) + 1
+      var randomN = () => Math.floor(Math.random() * 41) - 20
       const randomColor = () => Math.round(Math.random() * 4) + 1
 
       var linearGradient = d3
@@ -189,7 +189,7 @@ export default function createBarChart(sectionBodyDisplayChart) {
 
         datapoints
           .data(datasetUsed)
-          .join()
+          .join('path')
           .each(datum => {
             datasetUsed.forEach(d => {
               chart
@@ -200,7 +200,7 @@ export default function createBarChart(sectionBodyDisplayChart) {
                 .attr('d', () => {
                   return [positiveArc(xScale(datum[xValue]), yScale(datum[yValue]), random)]
                 })
-                .attr('stroke', 'red')
+                .attr('stroke', 'crimson')
                 .attr('stroke-width', '1')
                 .attr('fill', 'none')
                 .attr('transform', `translate(0, 5) `)
@@ -212,7 +212,6 @@ export default function createBarChart(sectionBodyDisplayChart) {
                 .duration(500)
                 .attr('defs')
                 .attr('d', () => {
-                  console.log(xValue)
                   return positiveArc(xScale(datum[xValue]), yScale(datum[yValue]), random)
                 })
                 .attr('stroke', 'url(#linear-gradient)')
@@ -225,11 +224,10 @@ export default function createBarChart(sectionBodyDisplayChart) {
       }
 
       function positiveArc(x, y, ran) {
-        console.log(randomN())
         return `M  ${x}, ${y} 
           Q 
-          ${x} ${y - randomN()}, 
-          ${x + ran()} ${y - randomN()}, 
+          ${x + randomN()} ${y + randomN()}, 
+          ${x + ran()} ${y + randomN()}, 
           T
           ${x + 50} , ${y}`
       }

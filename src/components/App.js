@@ -5,11 +5,22 @@ import * as d3 from 'd3'
 const dataset = [
   { name: 'Alex', sex: 'M', age: 41, height: 74, weight: 170 },
   { name: 'Bert', sex: 'F', age: 42, height: 68, weight: 166 },
-  { name: 'Carl', sex: 'M', age: 32, height: 70, weight: 155 },
+  { name: 'Carl', sex: 'M', age: 63, height: 70, weight: 155 },
   { name: 'Dave', sex: 'M', age: 39, height: 72, weight: 167 },
-  { name: 'Elly', sex: 'F', age: 30, height: 66, weight: 124 },
+  { name: 'Elly', sex: 'F', age: 68, height: 66, weight: 124 },
   { name: 'Fran', sex: 'F', age: 33, height: 66, weight: 115 },
   { name: 'Gwen', sex: 'F', age: 26, height: 64, weight: 121 },
+  { name: 'Hank', sex: 'M', age: 66, height: 85, weight: 130 },
+  { name: 'Ivan', sex: 'M', age: 53, height: 65, weight: 145 },
+  { name: 'Jake', sex: 'M', age: 32, height: 45, weight: 120 },
+  { name: 'Kate', sex: 'M', age: 75, height: 78, weight: 178 },
+  { name: 'Luke', sex: 'M', age: 23, height: 66, weight: 141 },
+  { name: 'Myra', sex: 'M', age: 65, height: 24, weight: 160 },
+  { name: 'Neil', sex: 'M', age: 77, height: 78, weight: 174 },
+  { name: 'Omar', sex: 'M', age: 21, height: 98, weight: 139 },
+  { name: 'Page', sex: 'M', age: 69, height: 46, weight: 167 },
+  { name: 'Quin', sex: 'M', age: 17, height: 56, weight: 198 },
+  { name: 'Ruth', sex: 'M', age: 65, height: 54, weight: 174 },
 ]
 
 const chartWidth = 1200
@@ -56,12 +67,6 @@ const xScale = d3
   .nice()
 
 const ticks = xScale.ticks(8)
-
-const color = d3
-  .scaleLinear()
-  .domain(d3.extent(dataset.map(d => d.age)))
-  .range(['red', 'blue'])
-  .nice()
 
 function XAxis() {
   return (
@@ -148,12 +153,27 @@ class PointsOnChart extends React.Component {
     }
   }
 
-  passPropsCircle = e => {
+  passProps = e => {
     this.setState({
       cx: this.props.xValue,
       cy: this.props.yValue,
       isVisible: true,
     })
+  }
+
+  drawArcs(x, y) {
+    const xVal = xScale(x)
+    const yVal = yScale(y)
+    const ran = () => Math.floor(Math.random() * 30) + 1
+    var randomN = () => Math.floor(Math.random() * 41) - 20
+    console.log(ran())
+
+    return `M  ${xVal}, ${yVal} 
+            Q 
+            ${xVal + randomN()} ${yVal + randomN()}, 
+            ${xVal + ran()} ${yVal + randomN()}, 
+            T
+            ${xVal + 50} , ${yVal}`
   }
 
   render() {
@@ -163,15 +183,23 @@ class PointsOnChart extends React.Component {
           <CircleHoverGetAxisValue cxValue={this.state.cx} cyValue={this.state.cy} />
         ) : null}
         <circle
-          onMouseEnter={this.passPropsCircle}
+          onMouseEnter={this.passProps}
           onMouseLeave={() => this.setState({ isActive: false, isVisible: false })}
-          r={20}
+          r={10}
           cx={xScale(this.props.xValue)}
           cy={yScale(this.props.yValue)}
-          fill={color(this.props.xValue)}
           key={this.props.yValue}
         />
-        )
+        <path
+          onMouseEnter={this.passProps}
+          onMouseLeave={() => this.setState({ isActive: false, isVisible: false })}
+          d={this.drawArcs(this.props.xValue, this.props.yValue)}
+          stoke="black"
+          strokeWidth="1"
+          fill="none"
+          key={this.props.xValue}
+          stroke="crimson"
+        />
       </g>
     )
   }
