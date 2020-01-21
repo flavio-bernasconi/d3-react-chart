@@ -47,6 +47,12 @@ circle:hover {
 }
 .filter-group {
   margin-top: 0;
+  color: #93b0f0;
+  color: #275aca;
+  color: #c2cfeb;
+
+  color: #083172;
+  color: #c7c7c7;
 }
 h4 {
   margin-left: 15px;
@@ -73,4 +79,8 @@ button:hover {
 }
 button::first-letter {
   text-transform: capitalize;
+}
+.center {
+  display: flex;
+  justify-content: center;
 }

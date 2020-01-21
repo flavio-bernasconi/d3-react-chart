@@ -16,10 +16,3 @@ function renderApp() {
 
 // First render
 renderApp()
-
-// Hot module reloading
-if (module.hot) {
-  module.hot.accept('components/App', () => {
-    renderApp()
-  })
-}

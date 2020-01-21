@@ -85,8 +85,48 @@ export default function createBarChart(sectionBodyDisplayChart) {
       const margin = { left: 70, top: 20, right: 70, bottom: 20 }
       const innerWidth = chartWidth - margin.left - margin.right
       const innerHeight = chartHeight - margin.top - margin.bottom
+      const random = () => Math.floor(Math.random() * 10) + 1
+      var randomN = () => Math.floor(Math.random() * 21) - 10
+      const randomColor = () => Math.round(Math.random() * 4) + 1
 
-      console.log(dataset)
+      var linearGradient = d3
+        .select('svg')
+        .append('defs')
+        .append('linearGradient')
+        .attr('id', 'linear-gradient')
+        .attr('gradientTransform', 'rotate(90)')
+
+      var colorRange = ['#93b0f0', '#275aca', '#c2cfeb', '#083172', '#c7c7c7']
+
+      var color = d3
+        .scaleLinear()
+        .range(colorRange)
+        .domain([1, 2, 3, 4, 5])
+
+      linearGradient
+        .append('stop')
+        .attr('offset', '0%')
+        .attr('stop-color', color(randomColor()))
+
+      linearGradient
+        .append('stop')
+        .attr('offset', '25%')
+        .attr('stop-color', color(randomColor()))
+
+      linearGradient
+        .append('stop')
+        .attr('offset', '50%')
+        .attr('stop-color', color(randomColor()))
+
+      linearGradient
+        .append('stop')
+        .attr('offset', '75%')
+        .attr('stop-color', color(randomColor()))
+
+      linearGradient
+        .append('stop')
+        .attr('offset', '100%')
+        .attr('stop-color', color(randomColor()))
 
       d3.select(sectionBodyDisplayChart)
         .append('svg')
@@ -132,8 +172,6 @@ export default function createBarChart(sectionBodyDisplayChart) {
         ])
         yScale.domain(datasetUsed.map(d => d[yValue]))
 
-        const datapoints = chart.selectAll('circle')
-
         chart
           .selectAll('.x-axis')
           .transition()
@@ -147,34 +185,53 @@ export default function createBarChart(sectionBodyDisplayChart) {
           .duration(700)
           .call(yAxis)
 
-        datapoints.data(datasetUsed).join(
-          enter =>
-            enter
-              .append('circle')
-              .attr('fill', d => (d.sex === 'M' ? 'DarkTurquoise' : 'coral'))
-              .attr('r', 20)
-              .attr('cy', d => yScale(d[yValue]))
-              .attr('cx', d => xScale(d[xValue])),
-          update =>
-            update
-              .transition()
-              .duration(2000)
-              .attr('cy', d => yScale(d[yValue]))
-              .attr('cx', d => xScale(d[xValue]))
-              .attr('r', 20)
-              .attr('fill', 'black'),
-          exit =>
-            exit
-              .transition()
-              .duration(300)
-              .attr('r', 50)
-              .attr('fill', 'green')
-              .transition()
-              .duration(2000)
-              .attr('r', 0)
-              .attr('fill', 'red')
-              .remove()
-        )
+        const datapoints = chart.selectAll('path')
+
+        datapoints
+          .data(datasetUsed)
+          .join()
+          .each(datum => {
+            datasetUsed.forEach(d => {
+              chart
+                .append('path')
+                .attr('class', 'red')
+                .transition()
+                .duration(500)
+                .attr('d', () => {
+                  return [positiveArc(xScale(datum[xValue]), yScale(datum[yValue]), random)]
+                })
+                .attr('stroke', 'red')
+                .attr('stroke-width', '1')
+                .attr('fill', 'none')
+                .attr('transform', `translate(0, 5) `)
+                .style('opacity', 0.5)
+
+              chart
+                .append('path')
+                .transition()
+                .duration(500)
+                .attr('defs')
+                .attr('d', () => {
+                  console.log(xValue)
+                  return positiveArc(xScale(datum[xValue]), yScale(datum[yValue]), random)
+                })
+                .attr('stroke', 'url(#linear-gradient)')
+                .attr('stroke-width', '1')
+                .attr('fill', 'none')
+            })
+          })
+
+        datapoints.exit().remove()
+      }
+
+      function positiveArc(x, y, ran) {
+        console.log(randomN())
+        return `M  ${x}, ${y} 
+          Q 
+          ${x} ${y - randomN()}, 
+          ${x + ran()} ${y - randomN()}, 
+          T
+          ${x + 50} , ${y}`
       }
 
       drawChartElement(dataset, 'age', 'name')
