@@ -75,11 +75,7 @@ function createBarChart(dataset, domElementSelector) {
     .attr('width', chartWidth)
     .attr('height', chartHeight)
 
-  const chart = areaChart
-    .append('g')
-    .attr('width', innerWidth)
-    .attr('height', innerHeight)
-    .attr('transform', `translate(${margin.left}, ${margin.top})`)
+  const chart = areaChart.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
 
   const xScale = d3
     .scaleLinear()
