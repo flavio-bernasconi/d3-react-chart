@@ -7,11 +7,10 @@ import 'tachyons-extra'
 import './reset.css'
 import './style.css'
 import chart from './chart'
-import Chart2 from './chart'
 
 function renderApp() {
   chart(document.getElementById('root1'))
-  ReactDOM.render(<App />, document.getElementById('chart'))
+  ReactDOM.render(<App />, document.getElementById('destination'))
 }
 
 // First render

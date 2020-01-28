@@ -7830,6 +7830,14 @@ rc@^1.2.8:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-animated-dataset@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/react-animated-dataset/-/react-animated-dataset-0.0.2.tgz#1529649e5bd10b0920fc3c58450770a60e623645"
+  integrity sha512-hhqwFqU56pmWrsHm/OArgNap9MeXcFyllg9QLdrZlWFOJ95xVlN88Cqy+3Rr6xF+YtLr5biha45cRbe+QzsMDw==
+  dependencies:
+    d3 "^5.15.0"
+    react "^16.12.0"
+
 react-dev-utils@9.0.1:
   version "9.0.1"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-9.0.1.tgz#5c03d85a0b2537d0c46af7165c24a7dfb274bef2"

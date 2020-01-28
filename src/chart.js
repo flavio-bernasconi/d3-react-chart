@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
 import './style.css'
+import _ from 'lodash-es'
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min
@@ -14,13 +15,12 @@ function drawNodePath(x, y, ran) {
     ${ran()} ${ran()}, 
     ${ran()} ${ran()}, 
     T
-    ${x + 50}, ${y} `
+    ${x}, ${y} `
 }
 
 function generateLinearGradient(colorRange) {
   const linearGradient = d3
     .select('svg')
-    .append('defs')
     .append('linearGradient')
     .attr('id', 'linear-gradient')
     .attr('gradientTransform', 'rotate(90)')
@@ -59,8 +59,8 @@ function generateLinearGradient(colorRange) {
 function createBarChart(dataset, domElementSelector) {
   const chartWidth = 1200
   const chartHeight = 800
-  const margin = { left: 70, top: 40, right: 70, bottom: 20 }
-  const colorRange = ['#93b0f0', '#275aca', '#c2cfeb', '#083172', '#c7c7c7']
+  const margin = { left: 70, top: 60, right: 70, bottom: 60 }
+  const colorRange = ['white', 'white', 'pink', 'purple', '#c7c7c7']
   generateLinearGradient(colorRange)
 
   const innerWidth = chartWidth - margin.left - margin.right
@@ -99,81 +99,96 @@ function createBarChart(dataset, domElementSelector) {
   let currentXValue = 'age'
   const currentYValue = 'name'
 
-  function drawChartElement(datasetUsed, xValue, yValue) {
+  function drawChartElement(dataset, xValue, yValue) {
     currentXValue = xValue
-    xScale.domain([d3.min(datasetUsed, d => d[xValue]) - 3, d3.max(datasetUsed, d => d[xValue])])
-    yScale.domain(datasetUsed.map(d => d[yValue]))
+    xScale.domain([d3.min(dataset, d => d[xValue]) - 3, d3.max(dataset, d => d[xValue])])
+    yScale.domain(dataset.map(d => d[yValue]))
 
     chart
       .selectAll('.x-axis')
       .transition()
-      .duration(700)
+      .duration(1000)
       .call(xAxis)
       .attr('transform', `translate(0, ${innerHeight})`)
 
     chart
       .selectAll('.y-axis')
       .transition()
-      .duration(700)
+      .duration(1000)
       .call(yAxis)
 
-    const numberOfPathPerDatum = new Array(30).fill(0)
+    const pathsPerDatum = _.times(20, () => getRandomInt(2, 30))
 
-    const datapoints = chart
-      .selectAll('path')
-      .data(datasetUsed)
-      .join('path')
+    chart
+      .selectAll('g.person')
+      .data(dataset)
+      .join(
+        enter => {
+          const el = enter.append('g').attr('class', 'person')
 
-    datapoints.each(datum => {
-      const x = xScale(datum[currentXValue])
-      const coordinateY = yScale(datum[currentYValue])
-      numberOfPathPerDatum.forEach(d => {
-        chart
-          .append('path')
-          .attr('stroke', 'url(#linear-gradient)')
-          .attr('stroke-width', getRandomInt(0.5, 3))
-          .attr('fill', 'none')
-          .attr('transform', `translate(${0},${coordinateY})`)
-          .attr('d', () => drawNodePath(0, 0, randomN))
-          .transition()
-          .duration(500)
+          el.attr('transform', d => `translate(${0}, ${yScale(d[currentYValue])})`)
 
-          .attr('transform', `translate(${x},${coordinateY})`)
-      })
-    })
+          // concentricCircle(el)
 
-    datapoints.exit().remove()
+          // squareLeaf(dataset, el)
+
+          el.selectAll('path')
+            .data(pathsPerDatum)
+            .join(
+              enterPath => enterPath.append('path'),
+              updatePath => updatePath,
+              exitPath => exitPath.remove()
+            )
+            .attr('d', () => drawNodePath(0, 0, randomN))
+            .attr('stroke-width', d => getRandomInt(0.5, 4))
+            .attr('stroke', 'url(#linear-gradient)')
+
+          return el
+        },
+        update => update,
+        exit => exit.remove()
+      )
+      .transition()
+      .duration(1000)
+      .attr(
+        'transform',
+        d => `translate(${xScale(d[currentXValue])}, ${yScale(d[currentYValue])}), scale(0.8)`
+      )
+      .attr('fill', 'none')
   }
 
   drawChartElement(dataset, 'age', currentYValue)
 
-  const btnGroupText = [{ age: 'Age' }, { height: 'Height' }, { weight: 'Weight' }]
+  const btnGroupText = [
+    { xValue: 'age', label: 'Age' },
+    { xValue: 'height', label: 'Height' },
+    { xValue: 'weight', label: 'Weight' },
+  ]
 
-  for (let i = 0; i < btnGroupText.length; i++) {
-    const xVal = Object.keys(btnGroupText[i]).flat()
-    const textBtn = Object.values(btnGroupText[i]).flat()
+  btnGroupText.forEach(({ xValue, label }) => {
     d3.select('.buttons-x')
       .append('button')
-      .text(textBtn)
+      .text(label)
       .on('click', () => {
-        currentXValue = xVal[0]
+        currentXValue = xValue
         drawChartElement(dataset, currentXValue, currentYValue)
       })
-  }
+  })
 
-  const filtersGroupText = [{ M: ' only men' }, { F: ' only women' }]
+  const filtersGroupText = [
+    { filter: 'M', label: 'only men' },
+    { filter: 'F', label: 'only women' },
+  ]
 
-  for (let i = 0; i < filtersGroupText.length; i++) {
-    const xVal = Object.keys(filtersGroupText[i]).flat()
-    const textBtn = Object.values(filtersGroupText[i]).flat()
+  filtersGroupText.forEach(({ filter, label }) => {
     d3.select('.filter-group')
       .append('button')
-      .text(textBtn)
+      .text(label)
       .on('click', () => {
-        const filteredDataset = dataset.filter(d => d.sex === xVal[0])
+        const filteredDataset = dataset.filter(d => d.sex === filter)
         drawChartElement(filteredDataset, currentXValue, currentYValue)
       })
-  }
+  })
 }
 
 export default function requestDatasetAndCreateBarChart(sectionBodyDisplayChart) {
@@ -188,7 +203,6 @@ export default function requestDatasetAndCreateBarChart(sectionBodyDisplayChart)
         weight: Number(datum.weight),
         random: getRandomInt(5, 90),
       }))
-      console.log(datasetClean)
       return datasetClean
     })
     .then(dataset => {
@@ -214,4 +228,65 @@ function createButtons() {
   d3.select('.filter-group')
     .append('h4')
     .text('Filters')
+}
+
+function concentricCircle(el) {
+  var scale = d3
+    .scaleLinear()
+    .range(['white', 'steelblue'])
+    .domain([0, 70])
+
+  var data = [0, 10, 20, 30, 40, 50, 70]
+
+  var circles = el
+    .selectAll('circle')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr('r', d => d)
+    .attr('fill', 'none')
+    .style('stroke-width', '2')
+    .style('stroke', d => scale(d))
+
+  function transition() {
+    data = data.map(d => (d === 70 ? 0 : d + 10))
+
+    // Grow circles
+    circles
+      .data(data)
+      .filter(d => d > 0)
+      .transition()
+      .ease(d3.easeLinear)
+      .attr('r', d => d)
+      .style('stroke', d => scale(d))
+      .style('opacity', d => (d === 70 ? 0 : 1))
+      .duration(2300)
+
+    // Reset circles where r == 0
+    circles
+      .filter(d => {
+        return d === 0
+      })
+      .attr('r', 0)
+      .style('opacity', 1)
+      .style('stroke', d => scale(d))
+  }
+
+  setInterval(() => {
+    transition()
+  }, 2300)
+}
+
+function squareLeaf(dataset, el) {
+  el.selectAll('rect')
+    .data([1])
+    .join(enterCircle => enterCircle.append('rect'))
+    .attr('x', 0)
+    .attr('x', 0)
+    .attr('width', 60)
+    .attr('height', 60)
+    .attr('transform', `translate(-30,-30)`)
+    .attr('fill', 'DarkSlateGrey')
+    .attr('stroke', 'DarkSeaGreen')
+    .attr('stroke-width', 4)
 }

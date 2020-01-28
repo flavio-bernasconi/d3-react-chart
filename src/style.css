@@ -77,7 +77,19 @@ button::first-letter {
 .center {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 .buttons-x h4 {
   display: inline;
+}
+.btn-react-group {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.react-btn {
+  display: block;
+  margin-bottom: 40px;
+  width: 200px;
+  text-align: center;
 }
