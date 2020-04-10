@@ -60,7 +60,7 @@ function createBarChart(dataset, domElementSelector) {
   const chartWidth = 1200
   const chartHeight = 800
   const margin = { left: 70, top: 60, right: 70, bottom: 60 }
-  const colorRange = ['white', 'white', 'pink', 'purple', '#c7c7c7']
+  const colorRange = ['#f1fcfc', '#40e0d0', '#72b5b7', '#633a82', '#000080']
   generateLinearGradient(colorRange)
 
   const innerWidth = chartWidth - margin.left - margin.right

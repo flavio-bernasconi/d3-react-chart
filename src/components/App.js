@@ -16,7 +16,6 @@ const dataset = [
   { name: 'Gwen', sex: 'F', age: 26, height: 64, weight: 121 },
   { name: 'Hank', sex: 'M', age: 66, height: 85, weight: 130 },
   { name: 'Ivan', sex: 'M', age: 53, height: 65, weight: 145 },
-  { name: 'Jake', sex: 'M', age: 32, height: 45, weight: 120 },
   { name: 'Kate', sex: 'F', age: 75, height: 78, weight: 178 },
   { name: 'Luke', sex: 'M', age: 23, height: 66, weight: 141 },
   { name: 'Myra', sex: 'F', age: 65, height: 24, weight: 160 },
@@ -128,7 +127,6 @@ function YTicks(props) {
   const nameArr = currentDataset.map(d => d.name)
   yScale.domain(currentDataset.map(d => d.name))
 
-  console.log(nameArr)
   return (
     <g className="tick ">
       <AnimatedDataset
@@ -175,11 +173,10 @@ const drawArcs = (x, y, ran) => {
 
 class GroupOfPaths extends React.Component {
   render() {
-    const { xValue, yValue, xScale } = this.props
+    const { xValue, yValue, xScale, opacity } = this.props
     const xValueOnScale = xScale(xValue)
     const yValueOnScale = yScale(yValue)
     const pathsPerDatum = _.times(20, () => getRandomInt(2, 30))
-    console.log(yValueOnScale, yScale.domain())
 
     return (
       <AnimatedDataset
@@ -190,6 +187,7 @@ class GroupOfPaths extends React.Component {
           'stroke-width': () => getRandomInt(0.4, 3),
           fill: 'none',
           stroke: 'url(#linear-gradient-new)',
+          opacity,
         }}
         keyFn={(d, index) => index}
       />
@@ -217,11 +215,17 @@ class CreateButtons extends React.Component {
     )
   }
 }
+
 class CreateFilters extends React.Component {
   render() {
-    const { label, filterDataset, filter } = this.props
+    const { label, filterDataset, filter, setGenderFilter } = this.props
     return (
-      <button value={filter} onClick={filterDataset}>
+      <button
+        value={filter}
+        onClick={filterDataset}
+        onMouseEnter={() => setGenderFilter(filter)}
+        onMouseLeave={() => setGenderFilter(null)}
+      >
         {label}
       </button>
     )
@@ -232,10 +236,10 @@ export default class App extends React.Component {
   state = {
     currentXValue: 'age',
     currentDataset: dataset,
+    gender: null,
   }
 
   changeXDomain = e => {
-    console.log(e.target.value)
     this.setState({
       currentDataset: dataset,
       currentXValue: e.target.value,
@@ -243,20 +247,22 @@ export default class App extends React.Component {
   }
 
   filterDataset = e => {
-    console.log(e.target.value)
     const filter = e.target.value
     const filteredDataset = dataset.filter(d => d.sex === filter)
-    console.log('filtered', filteredDataset)
     this.setState({
       currentDataset: filteredDataset,
+    })
+  }
+
+  setGenderFilter = gender => {
+    this.setState({
+      gender,
     })
   }
 
   render() {
     const { currentXValue, currentDataset } = this.state
     const { changeXDomain, filterDataset } = this
-
-    console.log('current dataset', this.state.currentDataset)
 
     generateLinearGradient(colorRange)
 
@@ -269,30 +275,33 @@ export default class App extends React.Component {
 
     return (
       <React.Fragment>
-        <div className="btn-react-group">
-          {datasetButtons.map((button, i) => {
-            return (
-              <CreateButtons
-                key={i}
-                changeXDomain={changeXDomain}
-                xValue={button.xvalue}
-                label={button.label}
-              />
-            )
-          })}
-        </div>
+        <div className="btn-react-group flex-wrap">
+          <div className="w-100 flex center">
+            {datasetButtons.map((button, i) => {
+              return (
+                <CreateButtons
+                  key={i}
+                  changeXDomain={changeXDomain}
+                  xValue={button.xvalue}
+                  label={button.label}
+                />
+              )
+            })}
+          </div>
 
-        <div>
-          {datasetFilters.map(filter => {
-            return (
-              <CreateFilters
-                key={filter.keyFilter}
-                filter={filter.keyFilter}
-                filterDataset={filterDataset}
-                label={filter.label}
-              />
-            )
-          })}
+          <div className="w-100 flex center">
+            {datasetFilters.map(filter => {
+              return (
+                <CreateFilters
+                  key={filter.keyFilter}
+                  filter={filter.keyFilter}
+                  filterDataset={filterDataset}
+                  label={filter.label}
+                  setGenderFilter={this.setGenderFilter}
+                />
+              )
+            })}
+          </div>
         </div>
 
         <svg id="chart" width={chartWidth} height={chartHeight}>
@@ -308,6 +317,7 @@ export default class App extends React.Component {
                 xScale={xScale}
                 xValue={datum[currentXValue]}
                 yValue={datum.name}
+                opacity={this.state.gender === datum.sex || this.state.gender === null ? 1 : 0.1}
               />
             )
           })}
